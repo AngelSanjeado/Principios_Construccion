@@ -1,10 +1,10 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        // ===== OBJETOS BASE =====
         Usuario usuario = new Usuario(
                 "Omar", "Sanjeado",
                 "Av. Lerdo de Tejada",
@@ -12,20 +12,26 @@ public class Main {
                 "omar@gmail.com"
         );
 
-        Cuenta cuenta1 = new Cuenta("123456789", usuario, TipoCuenta.CORRIENTE, 20000);
-        Cuenta cuenta2 = new Cuenta("987654321", usuario, TipoCuenta.AHORRO, 15000);
+        Cuenta cuenta1 = new Cuenta(usuario, "123456789", TipoCuenta.CORRIENTE, 20000);
+        Cuenta cuenta2 = new Cuenta( usuario, "987654321", TipoCuenta.AHORRO, 15000);
+
+        usuario.agregarCuenta(cuenta1);
+        usuario.agregarCuenta(cuenta2);
 
         Tarjeta tarjeta1 = new Tarjeta("1234123412341234", "08/27", "123", "3080");
 
-        CuentaTarjeta.asociarCuentaTarjeta(tarjeta1, cuenta1);
-        CuentaTarjeta.asociarCuentaTarjeta(tarjeta1, cuenta2);
+        tarjeta1.asociarCuenta(cuenta1);
+        tarjeta1.asociarCuenta(cuenta2);
+
+        ArrayList<Tarjeta> tarjetas = new ArrayList<>();
+
+        tarjetas.add(tarjeta1);
 
         ATM atm = new ATM();
         Scanner sc = new Scanner(System.in);
 
         int opcionPrincipal;
 
-        // ===== MENÚ PRINCIPAL =====
         do {
             System.out.println("\n===== ATM SANMAR =====");
             System.out.println("1. Con tarjeta");
@@ -42,7 +48,7 @@ public class Main {
                     menuSinTarjeta(sc, atm);
                     break;
                 case 0:
-                    System.out.println("Hasta luego");
+                    System.out.println("Gracias por usar el ATM :)");
                     break;
                 default:
                     System.out.println("Opción inválida");
@@ -51,13 +57,20 @@ public class Main {
         } while (opcionPrincipal != 0);
     }
 
-    // ===== MENÚ CON TARJETA =====
-    static void menuConTarjeta(
-            Scanner sc,
-            ATM atm,
-            Tarjeta tarjeta,
-            Cuenta cuenta,
-            Usuario usuario) {
+    public static void menuConTarjeta(Scanner sc, ArrayList<Tarjeta> tarjetas, ATM atm) {
+
+        Tarjeta tarjeta;
+        do {
+            System.out.print("Ingrese el numero de la tarjeta: ");
+            String noTarjeta = sc.nextLine();
+
+            tarjeta = atm.buscarTarjeta(tarjetas, noTarjeta);
+
+            if (tarjeta == null) {
+                System.out.println("Tarjeta invalida. Intente de nuevo");
+            }
+            
+        } while (tarjeta == null);
 
         System.out.print("Ingrese NIP: ");
         String nip = sc.next();
@@ -81,13 +94,13 @@ public class Main {
             switch (opcion) {
                 case 1:
                     System.out.print("Monto a depositar: ");
-                    double dep = sc.nextDouble();
+                    double montoDeposito = sc.nextDouble();
                     atm.depositar(cuenta, dep, tarjeta.getNoTarjeta());
                     break;
 
                 case 2:
                     System.out.print("Monto a retirar: ");
-                    double ret = sc.nextDouble();
+                    double montoRetiro = sc.nextDouble();
                     atm.retirar(cuenta, ret, tarjeta.getNoTarjeta());
                     break;
 
@@ -164,5 +177,12 @@ public class Main {
         double efectivo = sc.nextDouble();
 
         atm.pagarServicioEfectivo(servicio, linea, efectivo);
+    }
+
+    public static void seleccionarCuenta(Tarjeta tarjeta){
+        tarjeta.mostrarCuentas();
+
+        System.out.println("Seleccione una cuenta: ");
+        
     }
 }

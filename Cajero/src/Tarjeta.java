@@ -23,16 +23,22 @@ public class Tarjeta {
         return (this.nip.equals(nip)? true : false);
     }
 
-    public void agregarCuenta(Cuenta cuenta){
+    public void asociarCuenta(Cuenta cuenta){
         cuentas.add(cuenta);
+        cuenta.agregarTarjeta(this);
     }
 
     public void mostrarCuentas(){
+        int i = 1;
         for (Cuenta cuenta : cuentas) {
-            System.out.println(cuenta);
+            System.out.println(i++ + ". " + cuenta.getTipoCuenta());
         }
     }
 
+    public Cuenta seleccionarCuenta(int i){
+        return cuentas.get( - 1);
+    }
+        
     @Override
     public String toString(){
         return String.format("Tarjeta: %s \nCuentas asociadas: %s", noTarjeta, cuentas);

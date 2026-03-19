@@ -1,25 +1,33 @@
+import java.util.ArrayList;
+
 public class ATM { 
+
+    public Tarjeta buscarTarjeta(ArrayList<Tarjeta> tarjetas, String noTarjeta){
+
+        for (Tarjeta t : tarjetas) {
+            if (t.getNoTarjeta().equals(noTarjeta)) {
+                return t;
+            }
+        }
+
+        return null;
+    }
 
     public boolean validarNIP(Tarjeta tarjeta, String nip){
        return tarjeta.validarNIP(nip);
     }
 
-    public boolean depositar(Cuenta cuenta, double monto, String noTarjeta){ 
+    public boolean depositar(Cuenta cuenta, double monto, Tarjeta tarjeta){ 
         
         if(monto <= 0) { 
             System.out.println("Monto invalido");
             return false;
         }
 
-        cuenta.deposito(monto); 
-        System.out.println("Deposito realizado con éxito :)");
-        
-        StringBuilder movimiento = new StringBuilder();
-        cuenta.registroMovimiento(movimiento.append("| ").append(cuenta.getTitular() + " | ").append(noTarjeta + " | ").append(cuenta.getTipoCuenta() + " | ").append("Deposito | ").append(monto + " |"));
-        return true;
+        return cuenta.deposito(monto, tarjeta); 
     }
 
-    public boolean retirar(Cuenta cuenta, double monto, String noTarjeta){
+    public boolean retirar(Cuenta cuenta, double monto, Tarjeta tarjeta){
         
         if (monto < 200) {
             System.out.println("El monto minimo de retiro es de $200");
@@ -31,30 +39,39 @@ public class ATM {
             return false;
         }
 
-        cuenta.retiro(monto);
-        System.out.println("Retiro realizado con exitoso :)");
-
-        StringBuilder movimiento = new StringBuilder();
-        cuenta.registroMovimiento(movimiento.append("| ").append(cuenta.getTitular() + " | ").append(noTarjeta + " | ").append(cuenta.getTipoCuenta() + " | ").append("Retiro | ").append(monto + " | "));
-          return true; 
+        return cuenta.retiro(monto, tarjeta);
     }
     
-    public boolean pagarServicioTarjeta(Cuenta cuenta, Servicio servicio, String lineaCaptura, String tarjeta, Usuario titular){ 
+    public boolean pagarServicioTarjeta(Cuenta cuenta, Servicio servicio, Tarjeta tarjeta){
+
         if (servicio.getMontoBase() > cuenta.getSaldo()){ 
             System.out.println("Fondos insuficiente");
             return false;
         }
         
-        cuenta.retiro(servicio.getMontoBase());
-        
-        StringBuilder movimiento = new StringBuilder();
-        cuenta.registroMovimiento(movimiento.append("| ").append(cuenta.getTitular() + " | ").append(tarjeta + " | ").append(cuenta.getTipoCuenta() + " | ").append("Pago de servicio: ").append(servicio.getTipoServicio() + " | ").append(servicio.getMontoBase() + " |"));
-        return true; 
+        return cuenta.pagarServicio(servicio.getMontoBase(), tarjeta);
     }
 
     public boolean pagarServicioEfectivo(Servicio servicio, String lineaCaptura, double monto){
-        if (monto <= 10 && monto % 10 != 0) {
-            System.out.println("Solo puedes ingresar bielletes");
+
+        if (monto < 20) {
+            System.out.println("Solo puedes ingresar billetes");
+            return false;
+        }
+
+        boolean combinacionValida = false;
+
+        for(int i = 0; i <= monto / 50; i++){
+            double resto = monto - (i * 50);
+
+            if(resto % 20 == 0){
+                combinacionValida = true;
+                break;
+            }
+        }
+
+        if(!combinacionValida){
+            System.out.println("Monto invalido");
             return false;
         }
 

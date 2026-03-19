@@ -1,16 +1,16 @@
 import java.util.ArrayList;
 
 public class Cuenta {
-    private String noCuenta;
     private Usuario titular;
+    private String noCuenta;
     private TipoCuenta tipoCuenta;
     private double saldo;
     private ArrayList<Tarjeta> tarjetas;
-    private ArrayList<StringBuilder> movimientos;
+    private ArrayList<Movimiento> movimientos;
 
-    public Cuenta(String noCuenta, Usuario titular, TipoCuenta tipoCuenta, double monto){
-        this.noCuenta = noCuenta;
+    public Cuenta(Usuario titular, String noCuenta, TipoCuenta tipoCuenta, double monto){
         this.titular = titular;
+        this.noCuenta = noCuenta;
         this.tipoCuenta = tipoCuenta;
         this.saldo = monto;
         tarjetas = new ArrayList<>();
@@ -21,24 +21,27 @@ public class Cuenta {
         return saldo;
     }
 
-    public String getTitular() {
-        return titular.getNombre() + titular.getApellido();
+    public Usuario getTitular() {
+        return titular;
     }
 
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
     }
 
-    public boolean deposito(double monto){
-        if (monto > 0){
-            this.saldo += monto;
-            return true;
+    public boolean deposito(double monto, Tarjeta tarjeta){
+        if (monto <= 0){
+            System.out.println("Monto invalido. Deposita minimo $1");
+            return false;
         }
-
-        return false;
+        
+        this.saldo += monto;
+        System.out.println("Deposito exitoso");
+        movimientos.add(new Movimiento(titular, tarjeta, this, TipoMovimiento.DEPOSITO, monto));
+        return true;
     }   
 
-    public boolean retiro(double monto){
+    public boolean retiro(double monto, Tarjeta tarjeta){
         if (monto <= 0) {
             System.out.println("Monto invalido. Retira una cantidad mayor a 0");
             return false;
@@ -50,20 +53,29 @@ public class Cuenta {
         }
         
         this.saldo -= monto;
+        System.out.println("Retiro exitoso");
+        movimientos.add(new Movimiento(titular, tarjeta, this, TipoMovimiento.RETIRO, monto));
+        return true;
+    }
+
+    public boolean pagarServicio(double monto, Tarjeta tarjeta){
+        if (monto <= 0) {
+            System.out.println("Monto invalido");
+            return false;
+        }
+
+        saldo -= monto;
+        System.out.println("Pago exitoso");
+        movimientos.add(new Movimiento(titular, tarjeta, this, TipoMovimiento.PAGO_SERVICIO, monto));
         return true;
     }
 
     public void agregarTarjeta(Tarjeta tarjeta){
         tarjetas.add(tarjeta);
-        
-    }
-
-    public void registroMovimiento(StringBuilder movimiento){
-        movimientos.add(movimiento);
     }
 
     @Override
     public String toString(){
-        return String.format("| %-10s | %-9s | %-15s | %-8.2f |", titular.getNombre() + titular.getApellido(), noCuenta, tipoCuenta, saldo);
+        return String.format("| %-10s | %-9s | %-15s | %-8.2f |", titular.getNombre() + " " + titular.getApellido(), noCuenta, tipoCuenta, saldo);
     }
 }
