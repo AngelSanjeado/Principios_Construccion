@@ -5,6 +5,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
+
+        System.out.print("Ingrese la operacion: ");
         String operacion = sc.nextLine();
 
         char[] cifras = operacion.toCharArray();
@@ -21,7 +23,7 @@ public class Main {
                 continue;
             }
 
-            if (cifras[i] == '-' && (i == 0 || esOperador(cifras[i - 1]))) {
+            if (cifras[i] == '-' && (i == 0 || esOperador(cifras, i))) {
                 numero += cifras[i];
                 continue;
             }
@@ -38,9 +40,18 @@ public class Main {
         System.out.printf("%.2f %c %.2f = %.2f", numeros.get(0), operador, numeros.get(1), calcular(numeros, operador));
     }
 
-    public static boolean esOperador(char caracter){
-        return switch (caracter) {
-            case '+', '/', '*', '-', ' ' -> true;
+    public static boolean esOperador(char[] caracter, int indice){
+        indice -= 1;
+
+        while (indice >= 0 && Character.isWhitespace(caracter[indice])){
+
+            if (indice == 0) return true;
+
+            indice -= 1;
+        }
+
+        return switch (caracter[indice]) {
+            case '+', '/', '*', '-' -> true;
             default -> false;
         };
     }
