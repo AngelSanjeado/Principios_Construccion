@@ -31,7 +31,9 @@ public class Main {
             numero = "";
         }
 
-        numeros.add(Double.parseDouble(numero));
+        if (!numero.isEmpty()){
+            numeros.add(Double.parseDouble(numero));
+        }
 
         System.out.printf("%.2f %c %.2f = %.2f", numeros.get(0), operador, numeros.get(1), calcular(numeros, operador));
     }
